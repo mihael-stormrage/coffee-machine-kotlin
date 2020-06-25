@@ -1,12 +1,17 @@
 package machine
 
+import java.util.*
+
+val scanner = Scanner(System.`in`)
+
 fun main() {
-    println("""
-        |Starting to make a coffee
-        |Grinding coffee beans
-        |Boiling water
-        |Mixing boiled water with crushed coffee beans
-        |Pouring coffee into the cup
-        |Pouring some milk into the cup
-        |Coffee is ready!""".trimMargin())
+    print("Write how many cups of coffee you will need: ")
+    val cups = scanner.nextInt()
+    val water = cups * 200
+    val milk = cups * 50
+    val coffee = cups * 15
+    println("""For $cups of coffee you will need:
+        |$water ml of water
+        |$milk ml of milk
+        |$coffee g of coffee beans""".trimMargin())
 }
