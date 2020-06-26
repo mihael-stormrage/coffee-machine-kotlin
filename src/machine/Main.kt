@@ -4,14 +4,19 @@ import java.util.*
 
 val scanner = Scanner(System.`in`)
 
-fun main() {
-    val coffeeMachine = CoffeeMachine()
+val coffeeMachine = CoffeeMachine()
 
-    print("${coffeeMachine.state()}\n\nWrite action (buy, fill, take): ")
+fun main() {
+    print("Write action (buy, fill, take, remaining, exit): ")
     when (scanner.next()) {
+        "remaining" -> println("\n${coffeeMachine.state()}\n")
         "buy" -> {
-            print("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino: ")
-            coffeeMachine.buy(scanner.nextInt())
+            print("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu: ")
+            val input = scanner.next()
+            when (input) {
+                "back" -> { println(); return main() }
+                "1", "2", "3" -> println ("${coffeeMachine.buy(input.toInt())}\n")
+            }
         }
         "fill" -> {
             print("Write how many ml of water do you want to add: ")
@@ -23,12 +28,14 @@ fun main() {
             print("Write how many disposable cups of coffee do you want to add: ")
             val dispcups = scanner.nextInt()
             coffeeMachine.fill(water, milk, coffee, dispcups)
+            println()
         }
         "take" -> {
-            println("I gave you $${coffeeMachine.take()}")
+            println("\nI gave you $${coffeeMachine.take()}\n")
         }
+        "exit" -> return
     }
-    println("\n${coffeeMachine.state()}")
+    main()
 }
 
 class CoffeeMachine(
@@ -45,13 +52,35 @@ class CoffeeMachine(
         |$dispcups of disposable cups
         |$money of money""".trimMargin()
 
-    fun buy(variety: Int) {
+    fun buy(variety: Int): String {
+        val _water: Int
+        val _milk: Int
+        val _coffee: Int
+        val _money: Int
+        
         when (variety) {
-            1 -> { water -= 250; coffee -= 16; money += 4 }
-            2 -> { water -= 350; milk -= 75; coffee -= 20; money += 7 }
-            3 -> { water -= 200; milk -= 100; coffee -= 12; money += 6 }
+            1 -> { _water = 250; _milk = 0; _coffee = 16; _money = 4 }
+            2 -> { _water = 350; _milk = 75; _coffee = 20; _money = 7 }
+            3 -> { _water = 200; _milk = 100; _coffee = 12; _money = 6 }
+            else -> { _water = 0; _milk = 0; _coffee = 0; _money = 0 }
         }
-        dispcups -= 1
+
+        fun outOf(res: String) = "Sorry, not enough $res!"
+
+        return when {
+            water - _water < 0 -> outOf("water")
+            milk - _milk < 0 -> outOf("milk")
+            coffee - _coffee < 0 -> outOf("coffee beans")
+            dispcups - 1 < 0 -> "Sorry, I'm out of disposable cups!"
+            else -> {
+                water -= _water
+                milk -= _milk
+                coffee -= _coffee
+                dispcups -= 1
+                money += _money
+                "I have enough resources, making you a coffee!"
+            }
+        }
     }
 
     fun fill(_water: Int, _milk: Int, _coffee: Int, _dispcups: Int) {
